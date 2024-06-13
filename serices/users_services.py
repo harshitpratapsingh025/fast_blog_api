@@ -2,6 +2,12 @@ from sqlalchemy.orm import Session
 
 from db.models.users_model import User
 from schemas.users import UserCreate
+from passlib.context import CryptContext
+
+
+def get_password_hash(password):
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    return pwd_context.hash(password)
 
 
 def get_user_by_email(db: Session, email: str):
@@ -17,7 +23,7 @@ def create_user(db: Session, user: UserCreate):
         first_name=user.first_name,
         last_name=user.last_name,
         email=user.email,
-        password=user.password,
+        password=get_password_hash(user.password),
     )
     db.add(db_user)
     db.commit()

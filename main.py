@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import users
+from routes.admin import admin
 from db.database import engine
 from db.models import users_model
 import sqlalchemy
@@ -24,3 +25,4 @@ app.add_middleware(
 )
 
 app.include_router(users.router)
+app.include_router(admin.router)
