@@ -5,8 +5,14 @@ from fastapi import Depends, HTTPException
 
 from db.database import get_db
 from db.models.users_model import User
-from schemas.users import UserCreate, UserSchema
-from serices.users_services import create_user, get_user_by_email
+from schemas.users import (
+    UserCreate,
+    UserSchema,
+    CreateUserProfile,
+    UserProfileSchema,
+    UpdateUserProfile,
+)
+from serices import users_services
 
 router = APIRouter()
 
@@ -18,7 +24,21 @@ async def read_users(db: Session = Depends(get_db)):
 
 @router.post("/users", response_model=UserSchema, status_code=201)
 async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = get_user_by_email(db=db, email=user.email)
+    db_user = users_services.get_user_by_email(db=db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email is already registered")
-    return create_user(db=db, user=user)
+    return users_services.create_user(db=db, user=user)
+
+
+@router.post("/user/profile", response_model=UserProfileSchema, status_code=201)
+async def create_user_profile(
+    profile: CreateUserProfile, db: Session = Depends(get_db)
+):
+    return users_services.create_user_profile(db=db, profile=profile)
+
+
+@router.put("/user/profile", response_model=UserProfileSchema, status_code=201)
+async def update_user_profile(
+    profile: UpdateUserProfile, db: Session = Depends(get_db)
+):
+    return users_services.update_user_profile(db=db, profile=profile)

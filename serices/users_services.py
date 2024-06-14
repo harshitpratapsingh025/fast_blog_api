@@ -1,7 +1,8 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from db.models.users_model import User
-from schemas.users import UserCreate
+from db.models.users_model import User, UserProfile
+from schemas.users import UserCreate, CreateUserProfile, UpdateUserProfile
 from passlib.context import CryptContext
 
 
@@ -31,14 +32,40 @@ def create_user(db: Session, user: UserCreate):
     return db_user
 
 
-def create_user_profile(db: Session, user: UserCreate):
-    db_user = User(
-        first_name=user.first_name,
-        last_name=user.last_name,
-        email=user.email,
-        password=user.password,
+def create_user_profile(db: Session, profile: CreateUserProfile):
+    db_profile = UserProfile(
+        education=profile.education,
+        addess=profile.addess,
+        city=profile.city,
+        state=profile.state,
+        pincode=profile.pincode,
+        language_id=profile.language_id,
+        country_id=profile.country_id,
+        user_id=profile.user_id,
     )
-    db.add(db_user)
+    db.add(db_profile)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(db_profile)
+    return db_profile
+
+
+def update_user_profile(db: Session, profile: UpdateUserProfile):
+    try:
+        user_profile = (
+            db.query(UserProfile).filter(UserProfile.id == profile.id).first()
+        )
+        if not user_profile:
+            raise HTTPException(status_code=400, detail="Invalid profile ID.")
+        user_profile.education = profile.education
+        user_profile.addess = profile.addess
+        user_profile.city = profile.city
+        user_profile.state = profile.state
+        user_profile.image = profile.image
+        user_profile.pincode = profile.pincode
+        user_profile.language_id = profile.language_id
+        user_profile.country_id = profile.country_id
+        db.commit()
+        return user_profile
+
+    except Exception as error:
+        raise HTTPException(status_code=400, detail=f"error is {error}")

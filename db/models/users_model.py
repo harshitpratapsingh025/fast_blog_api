@@ -12,7 +12,7 @@ class User(Timestamp, Base):
     first_name = Column(String(250), nullable=False)
     last_name = Column(String(250), nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
-    password = Column(String, nullable=False)
+    password = Column(String(250), nullable=False)
     is_active = Column(Boolean, default=True)
 
     profile = Relationship(
@@ -39,8 +39,11 @@ class UserProfile(Timestamp, Base):
     city = Column(String(80), nullable=True)
     state = Column(String(80), nullable=True)
     pincode = Column(String(10), nullable=True)
-    language_id = Column(Integer, ForeignKey("languages.id"), nullable=True, index=True)
-    country_id = Column(Integer, ForeignKey("countries.id"), nullable=True, index=True)
+    image = Column(String(250), nullable=True)
+    language_id = Column(
+        Integer, ForeignKey("languages.id"), nullable=False, index=True
+    )
+    country_id = Column(Integer, ForeignKey("countries.id"), nullable=False, index=True)
     user_id = Column(
         Integer,
         ForeignKey("users.id", ondelete="CASCADE"),
