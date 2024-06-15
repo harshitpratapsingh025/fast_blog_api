@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import users
+from routes import users, auth
 from routes.admin import admin
 from db.database import engine
 from db.models import users_model
-import sqlalchemy
 
 
 users_model.Base.metadata.create_all(bind=engine)
@@ -26,3 +25,4 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(admin.router)
+app.include_router(auth.router)

@@ -13,6 +13,7 @@ from schemas.users import (
     UpdateUserProfile,
 )
 from serices import users_services
+from serices.auth import get_current_active_user
 
 router = APIRouter()
 
@@ -32,9 +33,11 @@ async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/user/profile", response_model=UserProfileSchema, status_code=201)
 async def create_user_profile(
-    profile: CreateUserProfile, db: Session = Depends(get_db)
+    profile: CreateUserProfile,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
-    return users_services.create_user_profile(db=db, profile=profile)
+    return users_services.create_user_profile(db=db, profile=profile, user=current_user)
 
 
 @router.put("/user/profile", response_model=UserProfileSchema, status_code=201)

@@ -32,7 +32,7 @@ def create_user(db: Session, user: UserCreate):
     return db_user
 
 
-def create_user_profile(db: Session, profile: CreateUserProfile):
+def create_user_profile(db: Session, profile: CreateUserProfile, user: User):
     db_profile = UserProfile(
         education=profile.education,
         addess=profile.addess,
@@ -41,7 +41,7 @@ def create_user_profile(db: Session, profile: CreateUserProfile):
         pincode=profile.pincode,
         language_id=profile.language_id,
         country_id=profile.country_id,
-        user_id=profile.user_id,
+        user_id=user.id,
     )
     db.add(db_profile)
     db.commit()
