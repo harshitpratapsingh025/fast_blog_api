@@ -8,9 +8,10 @@ from schemas.admin.country_schema import CountrySchema, CountryCreate
 from schemas.admin.language_schema import LanguageCreate, LanguageSchema
 from schemas.admin.user_role_schema import RoleCreate, RoleSchema
 from serices.admin import country_services, language_services, user_role_services
-from db.models.users_model import Role
+from db.models.users_model import Role, User
+from serices.auth import get_current_active_user
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user)])
 
 
 # Country routes

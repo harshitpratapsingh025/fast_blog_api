@@ -49,11 +49,9 @@ def create_user_profile(db: Session, profile: CreateUserProfile, user: User):
     return db_profile
 
 
-def update_user_profile(db: Session, profile: UpdateUserProfile):
+def update_user_profile(db: Session, profile: UpdateUserProfile, user: User):
     try:
-        user_profile = (
-            db.query(UserProfile).filter(UserProfile.id == profile.id).first()
-        )
+        user_profile = db.query(UserProfile).filter(UserProfile.id == user.id).first()
         if not user_profile:
             raise HTTPException(status_code=400, detail="Invalid profile ID.")
         user_profile.education = profile.education
