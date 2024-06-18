@@ -1,4 +1,5 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from db.models.users_model import User, UserProfile
@@ -58,7 +59,7 @@ def update_user_profile(db: Session, profile: UpdateUserProfile, user: User):
         user_profile.addess = profile.addess
         user_profile.city = profile.city
         user_profile.state = profile.state
-        user_profile.image = profile.image
+        user_profile.image = None
         user_profile.pincode = profile.pincode
         user_profile.language_id = profile.language_id
         user_profile.country_id = profile.country_id
@@ -67,3 +68,24 @@ def update_user_profile(db: Session, profile: UpdateUserProfile, user: User):
 
     except Exception as error:
         raise HTTPException(status_code=400, detail=f"error is {error}")
+
+
+def update_user_profile_image(db: Session, file: UploadFile, user: User):
+    try:
+        with open(file.filename, "wb") as f:
+            while contents := file.file.read(1024 * 1024):
+                f.write(contents)
+        user_profile = db.query(UserProfile).filter(UserProfile.id == user.id).first()
+        if not user_profile:
+            raise HTTPException(
+                status_code=400, detail="User do not have profile created."
+            )
+        user_profile.image = file.filename
+        db.commit()
+
+    except Exception:
+        return {"message": "There was an error uploading the file"}
+    finally:
+        file.file.close()
+
+    return {"message": f"Successfully uploaded {file.filename}"}

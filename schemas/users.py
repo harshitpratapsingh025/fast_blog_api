@@ -1,3 +1,4 @@
+import fastapi
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from .admin.country_schema import CountrySchema

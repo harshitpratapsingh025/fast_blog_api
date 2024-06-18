@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, File, UploadFile
 from sqlalchemy.orm import Session
 from typing import List
 from fastapi import Depends, HTTPException
@@ -16,6 +16,7 @@ from serices import users_services
 from serices.auth import get_current_active_user
 
 router = APIRouter()
+user_router = APIRouter(prefix="/user")
 
 
 @router.post("/users", response_model=UserSchema, status_code=201)
@@ -33,7 +34,7 @@ async def read_users(
     return db.query(User).all()
 
 
-@router.post("/user/profile", response_model=UserProfileSchema, status_code=201)
+@user_router.post("/profile", response_model=UserProfileSchema, status_code=201)
 async def create_user_profile(
     profile: CreateUserProfile,
     db: Session = Depends(get_db),
@@ -42,10 +43,19 @@ async def create_user_profile(
     return users_services.create_user_profile(db=db, profile=profile, user=current_user)
 
 
-@router.put("/user/profile", response_model=UserProfileSchema, status_code=201)
+@user_router.put("/profile", response_model=UserProfileSchema, status_code=201)
 async def update_user_profile(
     profile: UpdateUserProfile,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
     return users_services.update_user_profile(db=db, profile=profile, user=current_user)
+
+
+@user_router.post("/upload")
+def upload(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    return users_services.update_user_profile_image(db=db, file=file, user=current_user)
