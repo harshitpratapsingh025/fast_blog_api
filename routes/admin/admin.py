@@ -7,9 +7,15 @@ from db.database import get_db
 from schemas.admin.country_schema import CountrySchema, CountryCreate
 from schemas.admin.language_schema import LanguageCreate, LanguageSchema
 from schemas.admin.user_role_schema import RoleCreate, RoleSchema
-from serices.admin import country_services, language_services, user_role_services
-from db.models.users_model import Role, User
+from schemas.admin.category_schema import CategoryCreate, CategorySchema
+from serices.admin import (
+    country_services,
+    language_services,
+    user_role_services,
+    category_services,
+)
 from serices.auth import get_current_active_user
+from serices.admin.category_services import delete_category
 
 router = APIRouter(dependencies=[Depends(get_current_active_user)])
 
@@ -81,3 +87,27 @@ async def delete(role_id: int, db: Session = Depends(get_db)):
 @router.put("/role", response_model=RoleSchema)
 async def update(role: RoleSchema, db: Session = Depends(get_db)):
     return user_role_services.update_role(db=db, role=role)
+
+
+# Category routes
+@router.get("/category", response_model=List[CategorySchema])
+async def get(db: Session = Depends(get_db)):
+    return category_services.get_all_categories(db=db)
+
+
+@router.post("/category", response_model=CategorySchema, status_code=201)
+async def create(category: CategoryCreate, db: Session = Depends(get_db)):
+    try:
+        return category_services.create_category(db=db, category=category)
+    except:
+        raise HTTPException(status_code=500, detail="Something went wrong")
+
+
+@router.delete("/category/{category_id}", response_model=CategorySchema)
+async def delete(category_id: int, db: Session = Depends(get_db)):
+    return category_services.delete_category(db=db, category_id=category_id)
+
+
+@router.put("/category", response_model=CategorySchema)
+async def update(category: CategorySchema, db: Session = Depends(get_db)):
+    return category_services.update_category(db=db, category=category)

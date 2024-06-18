@@ -25,6 +25,13 @@ class User(Timestamp, Base):
         passive_deletes=True,
         uselist=True,
     )
+    interests = Relationship(
+        "Categories",
+        secondary="user_interest",
+        back_populates="user_intrested",
+        passive_deletes=True,
+        uselist=True,
+    )
 
     def __repr__(self) -> str:
         return f"{self.__class__.__tablename__}, name: {self.email}"
@@ -108,6 +115,56 @@ class Languages(Base):
     name = Column(String(80), nullable=False)
 
     profile = Relationship("UserProfile", back_populates="language", uselist=False)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__tablename__}, name: {self.name}"
+
+
+class Categories(Base):
+
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(80), nullable=False)
+
+    user_intrested = Relationship(
+        "User",
+        secondary="user_interest",
+        back_populates="interests",
+        passive_deletes=True,
+    )
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__tablename__}, name: {self.name}"
+
+
+class UserInterest(Base):
+
+    __tablename__ = "user_interest"
+
+    id = Column(Integer, autoincrement=True)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    category_id = Column(
+        Integer, ForeignKey("categories.id", ondelete="CASCADE"), primary_key=True
+    )
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__tablename__}, name: {self.name}"
+
+
+class UserFollowing(Base):
+
+    __tablename__ = "user_following"
+
+    id = Column(Integer, autoincrement=True)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    author_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
 
     def __repr__(self) -> str:
         return f"{self.__class__.__tablename__}, name: {self.name}"
