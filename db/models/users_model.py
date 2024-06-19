@@ -142,7 +142,7 @@ class UserInterest(Base):
 
     __tablename__ = "user_interest"
 
-    id = Column(Integer, autoincrement=True)
+    id = Column(Integer, autoincrement=True, primary_key=True)
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
@@ -158,7 +158,7 @@ class UserFollowing(Base):
 
     __tablename__ = "user_following"
 
-    id = Column(Integer, autoincrement=True)
+    id = Column(Integer, autoincrement=True, primary_key=True)
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )

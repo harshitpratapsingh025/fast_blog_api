@@ -2,7 +2,7 @@ from fastapi import HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from db.models.users_model import User, UserProfile
+from db.models.users_model import User, UserInterest, UserProfile
 from schemas.users import UserCreate, CreateUserProfile, UpdateUserProfile
 from passlib.context import CryptContext
 
@@ -89,3 +89,14 @@ def update_user_profile_image(db: Session, file: UploadFile, user: User):
         file.file.close()
 
     return {"message": f"Successfully uploaded {file.filename}"}
+
+
+def add_user_interests(db: Session, category_list: CreateUserProfile, user: User):
+    for category in category_list:
+        db_profile = UserInterest(
+            category_id=category,
+            user_id=user.id,
+        )
+        db.add(db_profile)
+    db.commit()
+    return True

@@ -59,3 +59,14 @@ def upload(
     current_user: User = Depends(get_current_active_user),
 ):
     return users_services.update_user_profile_image(db=db, file=file, user=current_user)
+
+
+@user_router.post("/add_interests", response_model=bool, status_code=201)
+async def add_user_interests(
+    categories: List[int],
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    return users_services.add_user_interests(
+        db=db, category_list=categories, user=current_user
+    )
