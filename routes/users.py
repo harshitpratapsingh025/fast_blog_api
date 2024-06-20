@@ -70,3 +70,23 @@ async def add_user_interests(
     return users_services.add_user_interests(
         db=db, category_list=categories, user=current_user
     )
+
+
+@user_router.post("/follow", response_model=bool, status_code=201)
+async def follow_new_author(
+    author_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    return users_services.follow_new_author(
+        db=db, author_id=author_id, user=current_user
+    )
+
+
+@user_router.post("/unfollow", response_model=bool, status_code=201)
+async def unfollow_author(
+    author_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    return users_services.unfollow_author(db=db, author_id=author_id, user=current_user)

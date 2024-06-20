@@ -2,7 +2,7 @@ from fastapi import HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from db.models.users_model import User, UserInterest, UserProfile
+from db.models.users_model import User, UserInterest, UserProfile, UserFollowing
 from schemas.users import UserCreate, CreateUserProfile, UpdateUserProfile
 from passlib.context import CryptContext
 
@@ -91,12 +91,36 @@ def update_user_profile_image(db: Session, file: UploadFile, user: User):
     return {"message": f"Successfully uploaded {file.filename}"}
 
 
-def add_user_interests(db: Session, category_list: CreateUserProfile, user: User):
+def add_user_interests(db: Session, category_list, user: User):
     for category in category_list:
-        db_profile = UserInterest(
+        db_interest = UserInterest(
             category_id=category,
             user_id=user.id,
         )
-        db.add(db_profile)
+        db.add(db_interest)
     db.commit()
     return True
+
+
+def follow_new_author(db: Session, author_id: int, user: User):
+
+    db_following = UserFollowing(
+        author_id=author_id,
+        user_id=user.id,
+    )
+    db.add(db_following)
+    db.commit()
+    db.refresh(db_following)
+    return db_following
+
+
+def unfollow_author(db: Session, author_id: int, user: User):
+
+    following = (
+        db.query(UserFollowing)
+        .filter(UserFollowing.author_id == author_id, UserFollowing.user_id == user.id)
+        .first()
+    )
+    db.delete(following)
+    db.commit()
+    return following
